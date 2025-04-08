@@ -1,0 +1,26 @@
+{
+  "name": "part3",
+  "version": "1.0.0",
+  "description": "phonebook backend",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:ui": "rm -rf dist && cd ../part2/phonebook && npm run build && cp -r dist ../part3",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+  },
+  "author": "Kevin Ammerman",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-react": "^7.37.5",
+    "prettier": "^3.5.3"
+  }
+}
