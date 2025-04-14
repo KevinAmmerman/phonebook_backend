@@ -3,6 +3,7 @@ const Person = require('./models/persons');
 const express = require('express');
 const morgan = require('morgan');
 const app = express();
+const loadedPersons = [];
 
 app.use(
   morgan((tokens, req, res) => {
@@ -24,11 +25,12 @@ app.use(express.json());
 app.use(express.static('dist'));
 
 const checkIfContactExists = (name) => {
-  return persons.some((person) => person.name.toLowerCase() === name.toLowerCase());
+  return loadedPersons.some((person) => person.name.toLowerCase() === name.toLowerCase());
 };
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then((persons) => {
+    loadedPersons.concat(persons);
     response.json(persons);
   });
 });
@@ -57,14 +59,15 @@ app.post('/api/persons', (request, response) => {
     return response.status(400).json({ error: 'name must be unique' });
   }
 
-  const newContact = {
+  const newPerson = new Person({
     name: contact.name,
     number: contact.number,
     id,
-  };
+  });
 
-  persons = persons.concat(newContact);
-  response.json(newContact);
+  newPerson.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 app.get('/info', (request, response) => {
