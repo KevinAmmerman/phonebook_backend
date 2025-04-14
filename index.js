@@ -1,29 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
 const app = express();
-
-app.use(express.json());
-app.use(express.static('dist'));
-app.use(
-  morgan((tokens, req, res) => {
-    return [
-      tokens.method(req, res),
-      tokens.url(req, res),
-      tokens.status(req, res),
-      tokens.res(req, res, 'content-length'),
-      '-',
-      tokens['response-time'](req, res),
-      'ms',
-      '-',
-      `${JSON.stringify(req.body)}`,
-    ].join(' ');
-  })
-);
-
-const checkIfContactExists = (name) => {
-  return persons.some((person) => person.name.toLowerCase() === name.toLowerCase());
-};
-
 let persons = [
   {
     id: '1',
@@ -46,6 +23,29 @@ let persons = [
     number: '39-23-6423122',
   },
 ];
+
+app.use(
+  morgan((tokens, req, res) => {
+    return [
+      tokens.method(req, res),
+      tokens.url(req, res),
+      tokens.status(req, res),
+      tokens.res(req, res, 'content-length'),
+      '-',
+      tokens['response-time'](req, res),
+      'ms',
+      '-',
+      `${JSON.stringify(req.body)}`,
+    ].join(' ');
+  })
+);
+
+app.use(express.json());
+app.use(express.static('dist'));
+
+const checkIfContactExists = (name) => {
+  return persons.some((person) => person.name.toLowerCase() === name.toLowerCase());
+};
 
 app.get('/api/persons', (request, response) => {
   response.json(persons);
