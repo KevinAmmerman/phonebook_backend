@@ -28,6 +28,16 @@ const checkIfContactExists = (name) => {
   return loadedPersons.some((person) => person.name.toLowerCase() === name.toLowerCase());
 };
 
+app.get('/api/info', (request, response) => {
+  Person.countDocuments({}).then((count) => {
+    if (count === 0) return response.status(400).end();
+    const info = `<span>Phonebook has info for ${
+      count
+    } people</span><br><br><span>${Date()}</span>`;
+    response.send(info);
+  });
+});
+
 app.get('/api/persons', (request, response, next) => {
   Person.find({})
     .then((persons) => {
@@ -37,13 +47,15 @@ app.get('/api/persons', (request, response, next) => {
     .catch(next);
 });
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   const id = request.params.id;
-  const person = persons.find((person) => person.id === id);
-  if (!person) {
-    return response.status(404).end();
-  }
-  response.json(person);
+  Person.findById(id)
+    .then((person) => {
+      if (person) {
+        return response.json(person);
+      }
+    })
+    .catch(next);
 });
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -83,13 +95,6 @@ app.put('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndUpdate(id, { number }, { new: true, runValidators: true })
     .then((person) => response.json(person))
     .catch(next);
-});
-
-app.get('/info', (request, response) => {
-  const info = `<span>Phonebook has info for ${
-    persons.length
-  } people</span><br><br><span>${Date()}</span>`;
-  response.send(info);
 });
 
 const errorHandler = (error, request, response, next) => {
