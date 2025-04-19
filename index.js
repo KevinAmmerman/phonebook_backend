@@ -31,7 +31,7 @@ const checkIfContactExists = (name) => {
 app.get('/api/persons', (request, response, next) => {
   Person.find({})
     .then((persons) => {
-      loadedPersons.push(persons);
+      loadedPersons.concat(persons);
       response.json(persons);
     })
     .catch(next);
@@ -60,6 +60,7 @@ app.post('/api/persons', (request, response, next) => {
   if (!contact.name || !contact.number) {
     return response.status(400).json({ error: 'name and number are required' });
   } else if (checkIfContactExists(contact.name)) {
+    console.log(contact);
     return response.status(400).json({ error: 'name must be unique' });
   }
 
@@ -73,6 +74,14 @@ app.post('/api/persons', (request, response, next) => {
     .then((savedPerson) => {
       response.json(savedPerson);
     })
+    .catch(next);
+});
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const id = request.params.id;
+  const number = request.body.number;
+  Person.findByIdAndUpdate(id, { number }, { new: true, runValidators: true })
+    .then((person) => response.json(person))
     .catch(next);
 });
 
